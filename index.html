@@ -3,34 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>キッズワールド</title>
+    <title>キッズワールド - 知育アプリ</title>
     <style>
-        /* 基本デザイン */
-        body { font-family: sans-serif; background-color: #E0F7FA; text-align: center; margin: 0; padding: 10px; }
-        .screen { display: none; padding-top: 20px; }
-        .active { display: block; }
-        
-        /* ボタン */
-        .btn { display: block; width: 90%; max-width: 300px; margin: 15px auto; padding: 20px; font-size: 20px; border-radius: 15px; border: none; color: white; cursor: pointer; font-weight: bold; }
-        .btn-quiz { background: #2196F3; }
-        .btn-gallery { background: #9C27B0; }
-        .btn-manga { background: #FF9800; }
-        .btn-game { background: #4CAF50; }
-        .btn-home { background: #607D8B; }
+        /* --- デザイン設定 --- */
+        :root {
+            --bg-color: #E0F7FA;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-quiz: #2196F3;
+            --accent-gallery: #9C27B0;
+            --accent-manga: #FF9800;
+            --accent-game: #4CAF50;
+            --accent-home: #607D8B;
+        }
 
-        /* 画像表示エリア */
-        .content-image { max-width: 90%; border-radius: 10px; margin-bottom: 10px; }
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* ヘッダー */
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #banana-display { font-size: 20px; font-weight: bold; color: #FBC02D; }
+
+        /* 画面切り替え */
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* カードと画像 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 500px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .content-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* ボタン */
+        .btn {
+            display: block;
+            width: 95%;
+            max-width: 350px;
+            margin: 12px auto;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+            transition: 0.1s;
+        }
+        .btn:active { transform: translateY(6px); box-shadow: none; }
         
-        /* 吹き出し（ギャラリー・マンガ用） */
-        .fukidashi {
-            background: white; border-radius: 15px; padding: 15px; position: relative;
-            margin: 10px auto; width: 80%; border: 3px solid #333; font-weight: bold;
+        .btn-quiz { background: var(--accent-quiz); }
+        .btn-gallery { background: var(--accent-gallery); }
+        .btn-manga { background: var(--accent-manga); }
+        .btn-game { background: var(--accent-game); }
+        .btn-home { background: var(--accent-home); }
+
+        /* クイズ・解説用テキスト */
+        .question-text { font-size: 22px; font-weight: bold; margin: 15px 0; }
+        .explanation-text { font-size: 18px; text-align: left; line-height: 1.6; background: #fef9e7; padding: 15px; border-radius: 10px; }
+        .result-mark { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+
+        /* 吹き出し風 */
+        .bubble {
+            position: relative;
+            background: #fff;
+            border: 3px solid #333;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px auto;
+            width: 85%;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div id="banana-bar">🍌 バナナ: <span id="banana-count">0</span></div>
+    <div id="top-bar">
+        <div id="user-info">🧒 ぼく・わたし</div>
+        <div id="banana-display">🍌 バナナ: <span id="banana-count">0</span></div>
+    </div>
 
     <div id="screen-menu" class="screen active">
         <h1>なにであそぶ？</h1>
@@ -54,88 +132,160 @@
         <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
     </div>
 
+    <div id="screen-manga-menu" class="screen">
+        <h2>どれをよむ？</h2>
+        <button class="btn btn-manga" onclick="alert('準備中！')">💪 ムキムキになれる？</button>
+        <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
+    </div>
+
+    <div id="screen-game-menu" class="screen">
+        <h2>どのゲーム？</h2>
+        <button class="btn btn-game" onclick="alert('準備中！')">🐹 もぐらたたき</button>
+        <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
+    </div>
+
     <div id="screen-content" class="screen">
-        <h2 id="content-title"></h2>
+        <h2 id="content-title">タイトル</h2>
         <div id="content-area">
             </div>
-        <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 やめる</button>
     </div>
 
     <script>
-    // --- データ構造の整理（imagesフォルダ対応） ---
-    const appData = {
-        quiz: {
-            planet: [
-                {
-                    title: "わくせいクイズ",
-                    text: "たいように いちばん ちかいのは？",
-                    img: "images/mercury.jpg", // imagesフォルダの中を参照
-                    options: ["すいせい", "ちきゅう", "かせい"],
-                    ans: "すいせい",
-                    memo: "とっても あつい ほしなんだよ！"
-                }
-            ]
-        },
-        gallery: {
-            art: [
-                {
-                    title: "モナ・リザ",
-                    img: "images/monalisa.jpg",
-                    comment: "わたし、まゆげが ないの。ふしぎでしょ？"
-                }
-            ]
+        // --- データ管理 ---
+        const appData = {
+            quiz: {
+                planet: [
+                    {
+                        title: "わくせいクイズ",
+                        text: "たいように いちばん ちかいのは？",
+                        img: "images/mercury.jpg",
+                        options: ["すいせい", "ちきゅう", "かせい"],
+                        ans: "すいせい",
+                        explanation: "すいせいは、太陽のすぐそばにあって、昼間はとっても熱いんだよ！"
+                    },
+                    {
+                        title: "わくせいクイズ",
+                        text: "一番大きな惑星（わくせい）は？",
+                        img: "images/jupiter.jpg",
+                        options: ["どせい", "もくせい", "かせい"],
+                        ans: "もくせい",
+                        explanation: "もくせいは地球が1300個も入るくらい、とっても大きいんだ！"
+                    }
+                ],
+                flag: [
+                    {
+                        title: "こっきクイズ",
+                        text: "このはたは、どこのくに？",
+                        img: "images/flag_jp.png",
+                        options: ["にほん", "アメリカ", "フランス"],
+                        ans: "にほん",
+                        explanation: "日本の国旗は「日の丸（ひのまる）」って呼ぶんだよ。"
+                    }
+                ]
+            },
+            gallery: {
+                art: [
+                    {
+                        title: "モナ・リザ",
+                        img: "images/monalisa.jpg",
+                        comment: "わたし、まゆげが ないの。ふしぎでしょ？レオナルド・ダ・ヴィンチが描いたんだよ。"
+                    }
+                ],
+                body: [
+                    {
+                        title: "い（胃）",
+                        img: "images/stomach.jpg",
+                        comment: "食べたものをドロドロに溶かして、バイキンもやっつけるよ！"
+                    }
+                ]
+            }
+        };
+
+        // --- 状態管理 ---
+        let bananas = parseInt(localStorage.getItem('kidsBananas')) || 0;
+        let currentGenre = "";
+        let currentIdx = 0;
+
+        // --- 初期表示 ---
+        document.getElementById('banana-count').innerText = bananas;
+
+        // 画面切り替え
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
         }
-    };
 
-    let bananas = 0;
-
-    // 画面切り替え関数
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    // クイズ開始
-    function startQuiz(genre) {
-        showScreen('screen-content');
-        const q = appData.quiz[genre][0]; // ひとまず1問目
-        document.getElementById('content-title').innerText = q.title;
-        
-        let html = `
-            <img src="${q.img}" class="content-image" onerror="this.src='https://placehold.jp/200x150.png?text=NoImage'">
-            <p>${q.text}</p>
-        `;
-        
-        q.options.forEach(opt => {
-            html += `<button class="btn btn-quiz" onclick="checkAnswer('${opt}', '${q.ans}', '${q.memo}')">${opt}</button>`;
-        });
-        
-        document.getElementById('content-area').innerHTML = html;
-    }
-
-    function checkAnswer(select, ans, memo) {
-        if(select === ans) {
-            alert("せいかい！ 🍌ゲット！\n\n" + memo);
-            bananas++;
-            document.getElementById('banana-count').innerText = bananas;
-        } else {
-            alert("ざんねん！");
+        // クイズ開始
+        function startQuiz(genre) {
+            currentGenre = genre;
+            currentIdx = 0;
+            showQuestion();
         }
-        showScreen('screen-menu');
-    }
 
-    // 図鑑表示
-    function showGallery(genre) {
-        showScreen('screen-content');
-        const item = appData.gallery[genre][0];
-        document.getElementById('content-title').innerText = item.title;
-        
-        document.getElementById('content-area').innerHTML = `
-            <img src="${item.img}" class="content-image" onerror="this.src='https://placehold.jp/200x150.png?text=NoImage'">
-            <div class="fukidashi">${item.comment}</div>
-            <button class="btn btn-home" onclick="showScreen('screen-gallery-menu')">つぎをみる</button>
-        `;
-    }
-</script>
+        // クイズ表示
+        function showQuestion() {
+            showScreen('screen-content');
+            const q = appData.quiz[currentGenre][currentIdx];
+            document.getElementById('content-title').innerText = q.title;
+            
+            let html = `
+                <div class="card">
+                    <img src="${q.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/200x150.png?text=画像準備中'">
+                    <p class="question-text">${q.text}</p>
+                    ${q.options.map(opt => `<button class="btn btn-quiz" onclick="checkAnswer('${opt}')">${opt}</button>`).join('')}
+                </div>
+            `;
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        // 正誤判定・解説
+        function checkAnswer(selected) {
+            const q = appData.quiz[currentGenre][currentIdx];
+            const isCorrect = (selected === q.ans);
+            
+            if(isCorrect) {
+                bananas++;
+                localStorage.setItem('kidsBananas', bananas);
+                document.getElementById('banana-count').innerText = bananas;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="result-mark" style="color:${isCorrect ? '#4CAF50':'#F44336'}">${isCorrect ? '⭕️ せいかい！' : '❌ おしい！'}</div>
+                    <img src="images/result_char.png" style="width:100px;" onerror="this.style.display='none'">
+                    <div class="explanation-text">${q.explanation}</div>
+                    <button class="btn btn-game" onclick="nextQuestion()">つぎへ</button>
+                    <button class="btn btn-home" onclick="showScreen('screen-menu')">トップへ</button>
+                </div>
+            `;
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if(currentIdx < appData.quiz[currentGenre].length) {
+                showQuestion();
+            } else {
+                alert("ぜんぶクリア！すごいね！");
+                showScreen('screen-menu');
+            }
+        }
+
+        // 図鑑表示
+        function showGallery(genre) {
+            showScreen('screen-content');
+            const item = appData.gallery[genre][0]; // 簡易的に1つ目
+            document.getElementById('content-title').innerText = item.title;
+            
+            document.getElementById('content-area').innerHTML = `
+                <div class="card">
+                    <img src="${item.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/200x150.png?text=画像準備中'">
+                    <div class="bubble">${item.comment}</div>
+                    <button class="btn btn-home" onclick="showScreen('screen-gallery-menu')">もどる</button>
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>
