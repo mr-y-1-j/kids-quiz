@@ -25,57 +25,39 @@
             padding: 10px;
             text-align: center;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* ヘッダー */
         #top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 10px 20px; border-radius: 30px;
+            margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         #banana-display { font-size: 20px; font-weight: bold; color: #FBC02D; }
 
         /* 画面切り替え */
-        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen { display: none; animation: fadeIn 0.3s ease; padding-bottom: 50px; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* カードと画像 */
         .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
-            margin: 10px auto;
-            max-width: 500px;
+            background: var(--card-bg); border-radius: 20px; padding: 20px;
+            margin: 10px auto; max-width: 500px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .content-image {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            max-width: 100%; height: auto; max-height: 250px;
+            border-radius: 10px; margin-bottom: 15px; object-fit: contain;
         }
 
         /* ボタン */
         .btn {
-            display: block;
-            width: 95%;
-            max-width: 350px;
-            margin: 12px auto;
-            padding: 18px;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-            transition: 0.1s;
+            display: block; width: 95%; max-width: 350px; margin: 12px auto;
+            padding: 18px; font-size: 20px; font-weight: bold;
+            border: none; border-radius: 20px; color: white; cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: 0.1s;
         }
         .btn:active { transform: translateY(6px); box-shadow: none; }
         
@@ -85,62 +67,72 @@
         .btn-game { background: var(--accent-game); }
         .btn-home { background: var(--accent-home); }
 
-        /* クイズ・解説用テキスト */
+        /* テキスト類 */
+        h2 { color: #444; margin-bottom: 20px; }
         .question-text { font-size: 22px; font-weight: bold; margin: 15px 0; }
-        .explanation-text { font-size: 18px; text-align: left; line-height: 1.6; background: #fef9e7; padding: 15px; border-radius: 10px; }
-        .result-mark { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
-
-        /* 吹き出し風 */
-        .bubble {
-            position: relative;
-            background: #fff;
-            border: 3px solid #333;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px auto;
-            width: 85%;
-            font-weight: bold;
+        .explanation-text { 
+            font-size: 18px; text-align: left; line-height: 1.6; 
+            background: #fff8e1; padding: 15px; border-radius: 10px; margin-top: 10px;
         }
+        .result-mark { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+        
+        /* 吹き出し（ギャラリー・マンガ用） */
+        .bubble {
+            position: relative; background: #fff; border: 3px solid #333;
+            border-radius: 15px; padding: 15px; margin: 10px auto;
+            width: 85%; font-weight: bold; text-align: left;
+        }
+
+        /* マンガ用ナビ */
+        .manga-nav { display: flex; justify-content: space-between; margin-top: 10px; }
+        .manga-nav .btn { width: 45%; margin: 0; padding: 10px; }
+
     </style>
 </head>
 <body>
 
     <div id="top-bar">
-        <div id="user-info">🧒 ぼく・わたし</div>
+        <div id="user-info">🧒 キッズモード</div>
         <div id="banana-display">🍌 バナナ: <span id="banana-count">0</span></div>
     </div>
 
     <div id="screen-menu" class="screen active">
         <h1>なにであそぶ？</h1>
         <button class="btn btn-quiz" onclick="showScreen('screen-quiz-menu')">❓ クイズ</button>
-        <button class="btn btn-gallery" onclick="showScreen('screen-gallery-menu')">🖼️ ずかん</button>
-        <button class="btn btn-manga" onclick="showScreen('screen-manga-menu')">📖 まんが</button>
+        <button class="btn btn-gallery" onclick="showScreen('screen-gallery-menu')">🖼️ ずかん (ギャラリー)</button>
+        <button class="btn btn-manga" onclick="showMangaList()">📖 まんが</button>
         <button class="btn btn-game" onclick="showScreen('screen-game-menu')">🎮 ゲーム</button>
+        <div style="margin-top:30px;"><small onclick="resetData()">データリセット</small></div>
     </div>
 
     <div id="screen-quiz-menu" class="screen">
-        <h2>どのクイズにする？</h2>
+        <h2>どのクイズ？</h2>
         <button class="btn btn-quiz" onclick="startQuiz('planet')">🪐 わくせい</button>
-        <button class="btn btn-quiz" onclick="startQuiz('flag')">🏁 こっき</button>
+        <button class="btn btn-quiz" onclick="startQuiz('clock')">🕒 とけい</button>
+        <button class="btn btn-quiz" onclick="startQuiz('kanji')">📖 ことば・かんじ</button>
+        <button class="btn btn-quiz" onclick="startQuiz('team')">⚽ スポーツ</button>
+        <button class="btn btn-quiz" onclick="startQuiz('body_food')">🍛 たべもの・からだ</button>
         <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
     </div>
 
     <div id="screen-gallery-menu" class="screen">
         <h2>なにをみる？</h2>
-        <button class="btn btn-gallery" onclick="showGallery('art')">🎨 めいが</button>
-        <button class="btn btn-gallery" onclick="showGallery('body')">🦴 からだ</button>
+        <button class="btn btn-gallery" onclick="startGallery('space')">🚀 うちゅう</button>
+        <button class="btn btn-gallery" onclick="startGallery('body')">🦴 からだ</button>
+        <button class="btn btn-gallery" onclick="startGallery('vehicle')">🚅 のりもの</button>
+        <button class="btn btn-gallery" onclick="startGallery('art')">🎨 めいが</button>
         <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
     </div>
 
     <div id="screen-manga-menu" class="screen">
-        <h2>どれをよむ？</h2>
-        <button class="btn btn-manga" onclick="alert('準備中！')">💪 ムキムキになれる？</button>
+        <h2>まんがを よむ</h2>
+        <div id="manga-list-area"></div>
         <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
     </div>
 
     <div id="screen-game-menu" class="screen">
         <h2>どのゲーム？</h2>
-        <button class="btn btn-game" onclick="alert('準備中！')">🐹 もぐらたたき</button>
+        <button class="btn btn-game" onclick="alert('じゅんび中！')">🐹 もぐらたたき</button>
         <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 もどる</button>
     </div>
 
@@ -151,87 +143,98 @@
     </div>
 
     <script>
-        // --- データ管理 ---
+        // --- アプリのデータ ---
         const appData = {
+            // クイズデータ
             quiz: {
                 planet: [
-                    {
-                        title: "わくせいクイズ",
-                        text: "たいように いちばん ちかいのは？",
-                        img: "images/mercury.jpg",
-                        options: ["すいせい", "ちきゅう", "かせい"],
-                        ans: "すいせい",
-                        explanation: "すいせいは、太陽（太陽）のすぐそばにあって、ひるまはとってもあついんだよ！"
-                    },
-                    {
-                        title: "わくせいクイズ",
-                        text: "いちばんおおきなわくせいは？",
-                        img: "images/jupiter.jpg",
-                        options: ["どせい", "もくせい", "かせい"],
-                        ans: "もくせい",
-                        explanation: "もくせいは、ちきゅうが1300こはいるくらいおおきいんだ！"
-                    }
+                    { title: "わくせい", text: "たいように いちばん ちかい ほしは？", img: "images/mercury.jpg", options: ["すいせい", "ちきゅう", "かせい"], ans: "すいせい", explanation: "すいせいは 太陽の すぐそばだよ。とっても あつい！" },
+                    { title: "わくせい", text: "たいよう(赤) と ちきゅう(青)。どっちが おおきい？", img: "images/compare_sun.jpg", options: ["たいよう", "ちきゅう"], ans: "たいよう", explanation: "たいようは 地球が109こも ならぶくらい おおきいんだよ！" }
                 ],
-                flag: [
-                    {
-                        title: "こっきクイズ",
-                        text: "このはたは、どこのくに？",
-                        img: "images/flag_jp.png",
-                        options: ["にほん", "アメリカ", "フランス"],
-                        ans: "にほん",
-                        explanation: "にほんのこっきはひのまるってよぶんだよ。"
-                    }
+                clock: [
+                    { title: "とけい", text: "みじかい はりが 「３」にあるよ。なんじかな？", img: "images/clock_3.jpg", options: ["１じ", "３じ", "６じ"], ans: "３じ", explanation: "みじかい はりの すうじを よんでみてね。" },
+                    { title: "とけい", text: "おやつの じかんは なんじかな？", img: "images/clock_3.jpg", options: ["３じ", "１０じ", "１２じ"], ans: "３じ", explanation: "３じは おやつの じかん！" }
+                ],
+                kanji: [
+                    { title: "かんじ", text: "「山」なんて よむかな？", img: "images/kanji_yama.png", options: ["うみ", "やま", "かわ"], ans: "やま", explanation: "やまの かたちから できた かんじだよ。" },
+                    { title: "かんじ", text: "「口」どこを あらわしている？", img: "images/kanji_kuchi.png", options: ["みみ", "くち", "め"], ans: "くち", explanation: "たべものを たべる くちの かたちだよ。" }
+                ],
+                team: [
+                    { title: "スポーツ", text: "サッカーは １チーム なんにん？", img: "images/soccer.jpg", options: ["９にん", "１１にん", "５にん"], ans: "１１にん", explanation: "みんなで １１にん！ 力を あわせて ゴールを めざすよ。" },
+                    { title: "スポーツ", text: "やきゅうは １チーム なんにん？", img: "images/baseball.jpg", options: ["９にん", "１１にん", "３にん"], ans: "９にん", explanation: "やきゅうは ９にんで あそぶ スポーツだよ。" }
+                ],
+                body_food: [
+                    { title: "りょうり", text: "カレーに いれないものは？", img: "images/curry.jpg", options: ["じゃがいも", "にんじん", "いちご"], ans: "いちご", explanation: "いちごは デザートだね！" },
+                    { title: "からだ", text: "たべものを ドロドロに とかすのは？", img: "images/stomach.jpg", options: ["い（胃）", "はな", "あし"], ans: "い（胃）", explanation: "「い」が たべものを しょうか するよ。" }
                 ]
             },
+            // ギャラリーデータ
             gallery: {
-                art: [
-                    {
-                        title: "モナ・リザ",
-                        img: "images/monalisa.jpg",
-                        comment: "わたし、まゆげが ないの。ふしぎでしょ？レオナルド・ダ・ヴィンチが描いたんだよ。"
-                    }
+                space: [
+                    { title: "どせい", img: "images/gal_saturn.jpg", desc: "まわりの わっかが きれいだね。こおりや いしで できているよ。" },
+                    { title: "ちきゅう", img: "images/gal_earth.jpg", desc: "あおい うみと しろい くも。わたしたちが すんでいる ほしだよ。" }
                 ],
                 body: [
-                    {
-                        title: "い（胃）",
-                        img: "images/stomach.jpg",
-                        comment: "食べたものをドロドロに溶かして、バイキンもやっつけるよ！"
-                    }
+                    { title: "ほね（こっかく）", img: "images/gal_bones.jpg", desc: "からだの なかには ほねが たくさん！" },
+                    { title: "は（歯）", img: "images/gal_teeth.jpg", desc: "たべものを かみくだくよ。はみがき しようね！" }
+                ],
+                vehicle: [
+                    { title: "リニアモーターカー", img: "images/gal_maglev.jpg", desc: "じしゃくの ちからで ういて はしるよ！" },
+                    { title: "ロケット", img: "images/gal_rocket.jpg", desc: "うちゅうへ いくための のりもの。すごい 火を だして とぶよ！" }
+                ],
+                art: [
+                    { title: "モナ・リザ", img: "images/gal_monalisa.jpg", desc: "わたし、まゆげが ないの。ふしぎでしょ？" },
+                    { title: "ひまわり", img: "images/gal_sunflower.jpg", desc: "ゴッホさんが かいた えだよ。きいろが 元気を くれるね！" }
                 ]
-            }
+            },
+            // マンガデータ
+            manga: [
+                { id: "muscle", title: "ムキムキに なれる？", pages: ["images/manga_muscle_1.jpg"] },
+                { id: "poop", title: "うんちは どこから？", pages: ["images/manga_poop_1.jpg"] }
+            ]
         };
 
-        // --- 状態管理 ---
+        // --- 状態管理変数 ---
         let bananas = parseInt(localStorage.getItem('kidsBananas')) || 0;
+        let currentMode = ""; // 'quiz', 'gallery', 'manga'
         let currentGenre = "";
         let currentIdx = 0;
 
-        // --- 初期表示 ---
+        // --- 初期化 ---
         document.getElementById('banana-count').innerText = bananas;
-
-        // 画面切り替え
+        
+        // --- 共通関数 ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
         }
 
-        // クイズ開始
-        function startQuiz(genre) {
-            currentGenre = genre;
-            currentIdx = 0;
-            showQuestion();
+        function resetData() {
+            if(confirm('バナナを ０に もどしても いいですか？')) {
+                localStorage.removeItem('kidsBananas');
+                location.reload();
+            }
         }
 
-        // クイズ表示
-        function showQuestion() {
+        // ============================
+        //  クイズ機能
+        // ============================
+        function startQuiz(genre) {
+            currentMode = "quiz";
+            currentGenre = genre;
+            currentIdx = 0;
+            quizLoop();
+        }
+
+        function quizLoop() {
             showScreen('screen-content');
             const q = appData.quiz[currentGenre][currentIdx];
             document.getElementById('content-title').innerText = q.title;
             
             let html = `
                 <div class="card">
-                    <img src="${q.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/200x150.png?text=画像準備中'">
+                    <img src="${q.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/300x200.png?text=がぞうじゅんびちゅう'">
                     <p class="question-text">${q.text}</p>
                     ${q.options.map(opt => `<button class="btn btn-quiz" onclick="checkAnswer('${opt}')">${opt}</button>`).join('')}
                 </div>
@@ -239,7 +242,6 @@
             document.getElementById('content-area').innerHTML = html;
         }
 
-        // 正誤判定・解説
         function checkAnswer(selected) {
             const q = appData.quiz[currentGenre][currentIdx];
             const isCorrect = (selected === q.ans);
@@ -253,40 +255,102 @@
             let html = `
                 <div class="card">
                     <div class="result-mark" style="color:${isCorrect ? '#4CAF50':'#F44336'}">${isCorrect ? '⭕️ せいかい！' : '❌ おしい！'}</div>
-                    <img src="images/result_char.png" style="width:100px;" onerror="this.style.display='none'">
                     <div class="explanation-text">${q.explanation}</div>
-                    <button class="btn btn-game" onclick="nextQuestion()">つぎへ</button>
-                    <button class="btn btn-home" onclick="showScreen('screen-menu')">トップへ</button>
+                    <button class="btn btn-game" onclick="nextContent()">つぎへ</button>
+                    <button class="btn btn-home" onclick="showScreen('screen-menu')">やめる</button>
                 </div>
             `;
             document.getElementById('content-area').innerHTML = html;
         }
 
-        function nextQuestion() {
-            currentIdx++;
-            if(currentIdx < appData.quiz[currentGenre].length) {
-                showQuestion();
-            } else {
-                alert("ぜんぶクリア！すごいね！");
-                showScreen('screen-menu');
-            }
+        // ============================
+        //  ギャラリー機能
+        // ============================
+        function startGallery(genre) {
+            currentMode = "gallery";
+            currentGenre = genre;
+            currentIdx = 0;
+            galleryLoop();
         }
 
-        // 図鑑表示
-        function showGallery(genre) {
+        function galleryLoop() {
             showScreen('screen-content');
-            const item = appData.gallery[genre][0]; // 簡易的に1つ目
+            const item = appData.gallery[currentGenre][currentIdx];
             document.getElementById('content-title').innerText = item.title;
-            
-            document.getElementById('content-area').innerHTML = `
+
+            let html = `
                 <div class="card">
-                    <img src="${item.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/200x150.png?text=画像準備中'">
-                    <div class="bubble">${item.comment}</div>
+                    <img src="${item.img}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/300x200.png?text=がぞうじゅんびちゅう'">
+                    <div class="bubble">${item.desc}</div>
+                    <button class="btn btn-gallery" onclick="nextContent()">つぎを みる ➡</button>
                     <button class="btn btn-home" onclick="showScreen('screen-gallery-menu')">もどる</button>
                 </div>
             `;
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        // ============================
+        //  マンガ機能
+        // ============================
+        function showMangaList() {
+            showScreen('screen-manga-menu');
+            const area = document.getElementById('manga-list-area');
+            area.innerHTML = "";
+            appData.manga.forEach((m, idx) => {
+                area.innerHTML += `<button class="btn btn-manga" onclick="startManga(${idx})">${m.title}</button>`;
+            });
+        }
+
+        function startManga(mangaIdx) {
+            currentMode = "manga";
+            currentGenre = mangaIdx; // ここでは配列のインデックスとして使用
+            currentIdx = 0; // ページ数
+            mangaLoop();
+        }
+
+        function mangaLoop() {
+            showScreen('screen-content');
+            const manga = appData.manga[currentGenre];
+            const pageImg = manga.pages[currentIdx];
+            document.getElementById('content-title').innerText = manga.title;
+
+            let html = `
+                <div class="card">
+                    <img src="${pageImg}" class="content-image" onerror="this.src='https://placehold.jp/24/cccccc/ffffff/300x400.png?text=マンガじゅんびちゅう'">
+                    <div class="manga-nav">
+                        <button class="btn btn-home" onclick="showMangaList()" style="width:100%">もどる</button>
+                        </div>
+                </div>
+            `;
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        // ============================
+        //  共通：次へ進む処理
+        // ============================
+        function nextContent() {
+            currentIdx++;
+            
+            if(currentMode === "quiz") {
+                if(currentIdx < appData.quiz[currentGenre].length) {
+                    quizLoop();
+                } else {
+                    alert("ぜんぶクリア！すごいね！");
+                    showScreen('screen-menu');
+                }
+            } else if (currentMode === "gallery") {
+                if(currentIdx < appData.gallery[currentGenre].length) {
+                    galleryLoop();
+                } else {
+                    if(confirm("ぜんぶ みたよ！ 最初にもどる？")) {
+                        currentIdx = 0;
+                        galleryLoop();
+                    } else {
+                        showScreen('screen-gallery-menu');
+                    }
+                }
+            }
         }
     </script>
 </body>
 </html>
-
