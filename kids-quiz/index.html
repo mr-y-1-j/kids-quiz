@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>キッズワールド</title>
+    <style>
+        /* --- 共通デザイン --- */
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+            background-color: #E0F7FA; /* 明るい空色 */
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            user-select: none;
+            color: #333;
+        }
+        
+        /* 画面管理 */
+        .screen { display: none; padding-bottom: 50px;}
+        .active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* バナナカウンター */
+        #top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #FFF; padding: 10px 20px; border-radius: 30px;
+            margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #banana-display { font-size: 20px; font-weight: bold; color: #FBC02D; }
+
+        /* ボタン共通 */
+        .btn {
+            display: block; width: 95%; max-width: 350px; margin: 15px auto;
+            padding: 18px; font-size: 20px; font-weight: bold;
+            border: none; border-radius: 20px; cursor: pointer; color: white;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
+        }
+        .btn:active { transform: translateY(6px); box-shadow: none; }
+        .btn-home { background: #FF7043; } /* 赤：戻る */
+        
+        /* メニューボタン色分け */
+        .btn-game { background: #4CAF50; }  /* 緑 */
+        .btn-quiz { background: #2196F3; }  /* 青 */
+        .btn-gallery { background: #9C27B0; } /* 紫 */
+        .btn-manga { background: #FF9800; } /* オレンジ */
+
+        /* --- クイズ画面用 --- */
+        #quiz-area {
+            background: white; border-radius: 20px; padding: 20px;
+            margin: 10px auto; max-width: 500px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        #question-image-area {
+            min-height: 150px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; overflow: hidden; border-radius: 10px; background: #f9f9f9;
+        }
+        img.q-img { max-width: 100%; max-height: 250px; }
+
+        /* 惑星サイズ比較用の円描画エリア */
+        .planet-comparison {
+            display: flex; align-items: flex-end; justify-content: center; gap: 20px;
+            height: 150px; width: 100%;
+        }
+        .planet-circle {
+            border-radius: 50%; display: inline-block;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* 音楽再生プレイヤー風 */
+        .music-player {
+            background: #333; color: white; padding: 20px; border-radius: 15px; width: 80%;
+        }
+        .play-icon { font-size: 40px; }
+
+        /* --- ギャラリー用 --- */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+        }
+        .gallery-item {
+            background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer;
+        }
+        .gallery-item img { width: 100%; height: 100px; object-fit: cover; }
+        .gallery-title { padding: 5px; font-size: 14px; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <div id="top-bar">
+        <div id="user-name">ゲスト</div>
+        <div id="banana-display">🍌 <span id="banana-count">0</span></div>
+    </div>
+
+    <div id="screen-menu" class="screen active">
+        <h1>なにをしてあそぶ？</h1>
+        <button class="btn btn-quiz" onclick="showGenreSelect()">❓ クイズ</button>
+        <button class="btn btn-gallery" onclick="showGalleryList()">🖼️ ずかん (ギャラリー)</button>
+        <button class="btn btn-game" onclick="alert('ここはゲーム画面！モグラたたきなどを実装予定')">🎮 ゲーム</button>
+        <button class="btn btn-manga" onclick="alert('ここはマンガ画面！')">📖 まんが</button>
+        <div style="margin-top:30px;">
+            <small onclick="resetData()" style="color:#aaa;">データリセット</small>
+        </div>
+    </div>
+
+    <div id="screen-genre" class="screen">
+        <h2>どのクイズ？</h2>
+        <button class="btn btn-quiz" onclick="startQuiz('planet')">🪐 わくせい・うちゅう</button>
+        <button class="btn btn-quiz" onclick="startQuiz('music')">🎵 おんがく</button>
+        <button class="btn btn-quiz" onclick="startQuiz('flag')">🏁 こっき</button>
+        <button class="btn btn-home" onclick="goHome()">🏠 もどる</button>
+    </div>
+
+    <div id="screen-quiz-main" class="screen">
+        <h2 id="q-text">もんだい</h2>
+        
+        <div id="quiz-area">
+            <div id="visual-content"></div>
+        </div>
+
+        <div id="options-area">
+            </div>
+        <button class="btn btn-home" onclick="goHome()" style="margin-top:20px; width:150px; font-size:16px;">やめる</button>
+    </div>
+
+    <div id="screen-gallery" class="screen">
+        <h2>ずかん</h2>
+        <div class="gallery-grid" id="gallery-container">
+            </div>
+        <button class="btn btn-home" onclick="goHome()">🏠 もどる</button>
+    </div>
+
+    <div id="overlay-feedback" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:100; align-items:center; justify-content:center; flex-direction:column;">
+        <div style="font-size:80px;" id="fb-icon">⭕</div>
+        <h2 id="fb-text" style="color:#E91E63; font-size:30px;">せいかい！</h2>
+        <p id="fb-comment" style="font-size:18px; padding:0 20px;"></p>
+        <button class="btn btn-quiz" onclick="nextQuestion()">つぎへ ➡</button>
+    </div>
+
+<script>
+    // --- データ群 ---
+
+    // 1. クイズデータ
+    const quizData = {
+        planet: [
+            {
+                type: "order", // 並び順クイズ
+                text: "たいように いちばん ちかい ほしは？",
+                image: "https://images-assets.nasa.gov/image/PIA03153/PIA03153~orig.jpg", // NASAの水星画像(ダミーURLとして機能)
+                options: ["すいせい (Mercury)", "ちきゅう (Earth)", "かせい (Mars)"],
+                answer: "すいせい (Mercury)",
+                comment: "たいようの すぐとなり！ とってもあついよ。"
+            },
+            {
+                type: "size-compare", // 【新機能】大きさ比較
+                text: "たいよう(赤) と ちきゅう(青)、ただしい おおきさは どっち？",
+                // sizeData: [太陽の大きさ, 地球の大きさ] の比率
+                optionsData: [
+                    { label: "A", sun: 100, earth: 50 }, // 間違い（差が小さい）
+                    { label: "B", sun: 150, earth: 5 }   // 正解（圧倒的な差）
+                ],
+                options: ["A", "B"],
+                answer: "B",
+                comment: "たいようは とってもおおきい！ ちきゅうの109ばいもあるんだよ。"
+            }
+        ],
+        music: [
+            {
+                type: "audio", // 【新機能】音楽クイズ
+                text: "この きょくの なまえは？",
+                // フリー音源へのリンク (例: クラシック名曲ライブラリ等)
+                audioSrc: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Beethoven_-_Symphony_No._5_-_1._Allegro_con_brio.ogg", 
+                options: ["うんめい", "きらきらぼし", "アンパンマン"],
+                answer: "うんめい",
+                comment: "ベートーベンの「うんめい」。ジャジャジャジャーン！"
+            }
+        ],
+        flag: [
+            { type: "image", text: "これは どこの くに？", image: "https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg", options: ["にほん", "アメリカ", "フランス"], answer: "にほん", comment: "あかいまるは、たいよう だよ。" }
+        ]
+    };
+
+    // 2. ギャラリーデータ
+    const galleryItems = [
+        { title: "ちきゅう", img: "https://images-assets.nasa.gov/image/PIA00114/PIA00114~orig.jpg", desc: "私たちが住んでいる星。青くてきれい。" },
+        { title: "かせい", img: "https://images-assets.nasa.gov/image/PIA02653/PIA02653~orig.jpg", desc: "赤い星。いつか人間が住めるかも？" },
+        { title: "もくせい", img: "https://images-assets.nasa.gov/image/PIA02873/PIA02873~orig.jpg", desc: "一番大きな惑星。シマシマ模様があるよ。" }
+    ];
+
+    // --- システム変数 ---
+    let bananas = 0;
+    let currentQuizList = [];
+    let currentQIndex = 0;
+
+    // --- 初期化 ---
+    window.onload = function() {
+        const saved = localStorage.getItem('kidsAppBananas');
+        if(saved) bananas = parseInt(saved);
+        updateBananas();
+    };
+
+    function updateBananas() {
+        document.getElementById('banana-count').innerText = bananas;
+        localStorage.setItem('kidsAppBananas', bananas);
+    }
+
+    function resetData() {
+        if(confirm("データをけしますか？")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // --- 画面遷移 ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('overlay-feedback').style.display = 'none'; // オーバーレイも消す
+    }
+    function goHome() { showScreen('screen-menu'); }
+    function showGenreSelect() { showScreen('screen-genre'); }
+
+    // --- クイズ機能 ---
+    function startQuiz(genre) {
+        currentQuizList = quizData[genre];
+        currentQIndex = 0;
+        if(!currentQuizList || currentQuizList.length === 0) {
+            alert("まだ もんだいがないよ！");
+            return;
+        }
+        showQuestion();
+    }
+
+    function showQuestion() {
+        showScreen('screen-quiz-main');
+        const q = currentQuizList[currentQIndex];
+        const visualArea = document.getElementById('visual-content');
+        const optionsArea = document.getElementById('options-area');
+        
+        document.getElementById('q-text').innerText = q.text;
+        visualArea.innerHTML = "";
+        optionsArea.innerHTML = "";
+
+        // 1. コンテンツの描画（タイプ別）
+        if (q.type === "size-compare") {
+            // 惑星サイズ比較（Canvas/CSSで円を描画）
+            let html = "";
+            q.optionsData.forEach(opt => {
+                html += `
+                <div style="margin-bottom:20px; border:2px solid #ddd; padding:10px; border-radius:10px;">
+                    <h3>${opt.label}</h3>
+                    <div class="planet-comparison">
+                        <div class="planet-circle" style="width:${opt.sun}px; height:${opt.sun}px; background:#FF5722;"></div> <div class="planet-circle" style="width:${opt.earth}px; height:${opt.earth}px; background:#2196F3;"></div> </div>
+                </div>`;
+            });
+            visualArea.innerHTML = html;
+
+        } else if (q.type === "audio") {
+            // 音楽プレイヤー
+            visualArea.innerHTML = `
+                <div class="music-player" style="margin:0 auto;">
+                    <div class="play-icon">▶️</div>
+                    <p>おとを きいてね</p>
+                    <audio id="quiz-audio" controls src="${q.audioSrc}"></audio>
+                </div>
+            `;
+            // 自動再生はブラウザ制限があるため、ユーザー操作に任せるか、ボタン押下で再生
+
+        } else {
+            // 通常画像 (NASA画像など)
+            if(q.image) {
+                visualArea.innerHTML = `<img src="${q.image}" class="q-img" alt="quiz image">`;
+            }
+        }
+
+        // 2. 選択肢ボタンの生成
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "btn btn-quiz";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt);
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected) {
+        const q = currentQuizList[currentQIndex];
+        const isCorrect = (selected === q.answer);
+        const overlay = document.getElementById('overlay-feedback');
+        
+        if (isCorrect) {
+            document.getElementById('fb-icon').innerText = "🍌"; // 正解ならバナナ
+            document.getElementById('fb-text').innerText = "せいかい！";
+            bananas++;
+            updateBananas();
+            // ここで正解音を鳴らす
+        } else {
+            document.getElementById('fb-icon').innerText = "😢";
+            document.getElementById('fb-text').innerText = "ざんねん...";
+        }
+
+        document.getElementById('fb-comment').innerText = q.comment || "";
+        overlay.style.display = "flex";
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        if (currentQIndex < currentQuizList.length) {
+            showQuestion();
+        } else {
+            alert("クリア！ すごいね！");
+            goHome();
+        }
+    }
+
+    // --- ギャラリー機能 ---
+    function showGalleryList() {
+        showScreen('screen-gallery');
+        const container = document.getElementById('gallery-container');
+        container.innerHTML = "";
+        
+        galleryItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "gallery-item";
+            div.innerHTML = `
+                <img src="${item.img}" alt="${item.title}">
+                <div class="gallery-title">${item.title}</div>
+            `;
+            div.onclick = () => {
+                // タップで解説アラート（本番は詳細モーダルへ）
+                alert(`【${item.title}】\n${item.desc}`);
+            };
+            container.appendChild(div);
+        });
+    }
+
+</script>
+</body>
+</html>
